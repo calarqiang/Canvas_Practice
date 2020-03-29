@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小球碰撞</title>
+</head>
+<body>
+    <canvas id='canvas'></canvas>
+    <script>
+        let ball={x:100,y:100,r:10,vx:4,vy:0,g:4,color:'#f00'};
+        let canvas=document.getElementById('canvas');
+        canvas.width=300;
+        canvas.height=300;
+        canvas.style.border='1px solid blue';
+        canvas.style.display='block';
+        canvas.style.margin='50px auto';
+        let ctx=canvas.getContext('2d');
+        function draw(ctx,ball){
+            ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+            ctx.fillStyle=ball.color;
+            ctx.beginPath();
+            update(ball);
+            ctx.arc(ball.x,ball.y,ball.r,0,2*Math.PI,false);
+            ctx.fill();
+        }
+        function update(ball){
+            ball.x=ball.x+ball.vx;
+            ball.y=ball.y+ball.vy;
+            ball.vy=ball.vy+ball.g;
+            //碰撞检测，底部
+            if(ball.y>=ctx.canvas.height-ball.r+2){
+                // 此时小球已到达最底部
+                ball.y=ctx.canvas.height-ball.r; //这个很重要
+                ball.vy=-ball.vy*0.7 //让vy变为原来的3/10,增加摩擦系数
+            }
+            //碰撞检测，右边
+            if(ball.x>=ctx.canvas.width-ball.r){
+                ball.vx=-ball.vx*0.9;
+            }
+            //碰撞检测，左边
+            if(ball.x<=ball.r){
+                ball.vx=-ball.vx*0.9;
+            }
+            
+        }
+        setInterval(function(){
+            draw(ctx,ball);
+        } ,100);
+    </script>
+</body>
+</html>

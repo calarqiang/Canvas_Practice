@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id='test'></canvas>
+    <script>
+        let canvas=document.getElementById('test');
+        canvas.width=200;
+        canvas.height=200;
+        canvas.style.border='1px solid blue';
+        canvas.style.display='block';
+        canvas.style.margin='200px auto';
+        let contex=canvas.getContext('2d');
+
+        contex.beginPath();
+        contex.moveTo(0,0);
+        contex.lineTo(200,100);
+        contex.strokeStyle='red';
+        contex.stroke();
+        contex.closePath();
+
+        contex.beginPath();
+        contex.moveTo(200,100);
+        contex.lineTo(150,200);
+        contex.closePath();
+        // 下面两行写在beginPath和closePath之间和新开启一段路径之前效果一样
+        contex.strokeStyle='green';
+        contex.stroke();
+
+       
+
+    </script>
+</body>
+</html>

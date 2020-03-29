@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>绘制弧线</title>
+</head>
+<body>
+    <!-- 当调用fill方法的时候，不管有没有closePath闭合路径，它都是会将路径首尾相连然后着色，
+    而如果调用的是stroke方法的话，如果没有closePath的话，它就不会闭合当前路径，如果有会闭合当前路径
+    所有说对于画弧线，如果没有closePath,用stroke的话，不会将两个首位两个点连接，如果有closePath，它会将首尾两个点
+    连接起来，而如果是用fill的话，canvas会自动将其首尾相连，不管有没有closePath都会闭合 -->
+    <canvas id='canvas'></canvas>
+    <script>
+        let canvas=document.getElementById('canvas');
+        canvas.width=800;
+        canvas.height=800;
+        canvas.style.border='1px solid yellow';
+        canvas.style.display='block';
+        canvas.style.margin='100px auto';
+        let ctx=canvas.getContext('2d');
+        for(let i=0;i<10;i++){
+            ctx.beginPath();
+            ctx.arc(20+i*80,400,40,0,2*Math.PI*(i+1)/10,false);
+            // 横纵坐标 半径 圆心 开始弧度 结束弧度 顺时针(不写默认为false)
+            ctx.closePath();
+            // 不写closePath的话就不会闭合
+            ctx.strokeStyle='red';
+            ctx.stroke();
+        }
+
+        for(let i=0;i<10;i++){
+            ctx.beginPath();
+            ctx.arc(20+i*80,600,40,0,2*Math.PI*(i+1)/10,true);
+            // 横纵坐标 半径 圆心 开始弧度 结束弧度 顺时针(不写默认为false)
+            // 不管写不写closePath的话都会闭合
+            ctx.fillStyle='green';
+            ctx.fill();
+        }
+    </script>
+</body>
+</html>

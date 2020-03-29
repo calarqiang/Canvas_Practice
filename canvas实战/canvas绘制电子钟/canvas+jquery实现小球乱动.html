@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <title>HTML5学习第5天[乱撞的球]</title>
+ <style>
+ body{
+  font-family: 微软雅黑; 
+ }
+ body,h1{
+  margin:0;
+ }
+ canvas{
+ /*将canvas的display改为block,才能实现居中对齐*/
+  display:block;
+  /* 画布居中对齐效果 */
+  margin-left: auto;
+  margin-right: auto;
+  border:1px solid #DDD; 
+  background: -webkit-linear-gradient(top, #222,#111);
+ } 
+ </style>
+</head>
+<body>
+ <h1>JS实现的随机乱撞的彩色圆球特效代码</h1>
+
+<canvas id="canvas" >
+</canvas>
+<button id="stop">stop</button>
+<button id="run">run</button>
+<button id="addBall">addBall</button>
+<!-- 引入Jquery代码，mdn -->
+<script src="http://www.alixixi.com/script/jquery-1.8.3.min.js"></script>
+<!-- 正式的js代码 -->
+<script>
+// 所有操作均写入一个对象内（nimo)
+var nimo={
+ aniamted:null,
+ content:null,
+ data:{
+  radiusRange:[5,20],
+  speedRange:[-5,5],
+  scrollHeight:null,
+  scrollWdith:null
+ },
+ balls:[],
+ ele:{
+  canvas:null  
+ },
+ fn:{
+  creatRandom:function(startInt,endInt){//生产随机数
+   var iResult; 
+   iResult=startInt+(Math.floor(Math.random()*(endInt-startInt+1)));
+   return iResult
+  },
+//   初始化函数操作，获取上下文以及设置画布的宽度和高度
+  init:function(){
+   nimo.data.scrollWdith=document.body.scrollWidth;
+   nimo.data.scrollHeight=document.body.scrollHeight;
+   nimo.ele.canvas=document.getElementById('canvas'); 
+   nimo.content=nimo.ele.canvas.getContext('2d');   
+//    定义画布的宽度和高度分别为body宽度-50和高度-100
+   nimo.ele.canvas.width=nimo.data.scrollWdith-50;
+   nimo.ele.canvas.height=nimo.data.scrollHeight-100;
+  },
+// 添加小球操作函数
+  addBall:function(){
+    //   定义一个存放随机颜色的数组
+   var aRandomColor=[];
+   //给这个数组添加一个随机的颜色数字，0-255其中的一个数值，用于给随机小球赋值（r.g.b值）
+   aRandomColor.push(nimo.fn.creatRandom(0,255));
+   aRandomColor.push(nimo.fn.creatRandom(0,255));
+   aRandomColor.push(nimo.fn.creatRandom(0,255)); 
+ // 定义小球的半径，用于接收5-20中其中一个数字，即画布上最大的小球半径为20，最小的小球半径为5
+   var iRandomRadius=nimo.fn.creatRandom(nimo.data.radiusRange[0],nimo.data.radiusRange[1]);
+// 绘制一个临时的小球
+   var oTempBall={
+       //随机小球的半径正好落在画布内
+    coordsX:nimo.fn.creatRandom(iRandomRadius,nimo.ele.canvas.width-iRandomRadius),
+    coordsY:nimo.fn.creatRandom(iRandomRadius,nimo.ele.canvas.height-iRandomRadius),
+    radius:iRandomRadius,    
+    bgColor:'rgba('+aRandomColor[0]+','+aRandomColor[1]+','+aRandomColor[2]+',0.5)'    
+   }; 
+   //小球的水平速度为-5~5，大小随机
+   oTempBall.speedX=nimo.fn.creatRandom(nimo.data.speedRange[0],nimo.data.speedRange[1]);
+   //如果小球的水平或者垂直速度为0的话，那么就将其赋值为+1
+   if(oTempBall.speedX===0){
+    oTempBall.speedX=1
+   }
+   if(oTempBall.speedY===0){
+    oTempBall.speedY=1
+   }
+   oTempBall.speedY=nimo.fn.creatRandom(nimo.data.speedRange[0],nimo.data.speedRange[1]);
+   //将这个随机小球添加到ball的小球数组中
+   nimo.balls.push(oTempBall)
+  },
+
+  //绘制小球函数
+  drawBall:function(){   
+   var i,iSize;
+   //清除画布操作
+   nimo.content.clearRect(0,0,nimo.ele.canvas.width,nimo.ele.canvas.height)
+   for(var i=0,iSize=nimo.balls.length;i<iSize;i++){
+    var oTarger=nimo.balls[i];    
+    nimo.content.beginPath();
+    nimo.content.arc(oTarger.coordsX,oTarger.coordsY,oTarger.radius,0,Math.PI*2);
+    nimo.content.fillStyle=oTarger.bgColor;    
+    nimo.content.fill();
+    //小球的边界碰撞检测
+    
+        //x方向碰撞检测，当球在临界点时，可能速度是继续往相反的方向跑，因此要取速度的绝对值
+     if(oTarger.coordsX+oTarger.radius>=nimo.ele.canvas.width){
+      oTarger.speedX=-(Math.abs(oTarger.speedX))
+     }
+     if(oTarger.coordsX-oTarger.radius<=0){
+      oTarger.speedX=Math.abs(oTarger.speedX)
+     }
+     //y方向碰撞检测
+     if(oTarger.coordsY-oTarger.radius<=0){
+      oTarger.speedY=Math.abs(oTarger.speedY)
+     }
+     if(oTarger.coordsY+oTarger.radius>=nimo.ele.canvas.height){
+      oTarger.speedY=-(Math.abs(oTarger.speedY))
+     }
+     //更改这10个小球对象的下一次绘制的圆心
+     oTarger.coordsX=oTarger.coordsX+oTarger.speedX;
+     oTarger.coordsY=oTarger.coordsY+oTarger.speedY;    
+      
+   }
+  },
+  run:function(){
+      //定时器开始之前，先调用一下绘制小球的函数，以免出现卡帧
+   nimo.fn.drawBall();
+   //这里用的是setTimeout这个函数，因此只调用一次就结束
+   nimo.aniamted=setInterval(function(){
+       //定时器开始之前，先调用一下绘制小球的函数，以免出现卡帧
+    nimo.fn.drawBall();
+    // nimo.aniamted=setTimeout(arguments.callee,10)
+   },10)
+  },
+
+  stop:function(){
+   clearTimeout(nimo.aniamted)
+  }
+ }
+}
+
+
+window.onload=function(){
+ nimo.fn.init();
+ var i;
+ //生成位置合理的10个小球
+ for(var i=0;i<10;i++){
+  nimo.fn.addBall();
+ }
+
+ nimo.fn.run();
+ //3个按钮实现事件功能
+ document.getElementById('stop').onclick=function(){
+  nimo.fn.stop()
+ }
+ document.getElementById('run').onclick=function(){
+  nimo.fn.stop()
+  nimo.fn.run()
+ }
+ document.getElementById('addBall').onclick=function(){
+  var i;
+  for(var i=0;i<10;i++){
+   nimo.fn.addBall();  
+  }
+  nimo.fn.drawBall();
+ }
+
+}
+</script>
+</body>
+</html>

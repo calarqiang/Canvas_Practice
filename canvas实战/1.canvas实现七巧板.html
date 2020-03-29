@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>canvas实现七巧板</title>
+    <style>
+        *{
+            margin:0;
+            padding:0;
+        }
+        canvas{
+            border:1px solid black;
+            display:block;
+            /* 设置为block，才可以居中显示 */
+            margin:100px auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id='canvas'>
+        你的浏览器不支持canvas渲染
+        <!-- 这行字如果浏览器不支持，会忽略 -->
+    </canvas>
+    <script>
+        let canvas=document.getElementById('canvas');
+        let contex=canvas.getContext('2d');
+        canvas.width=800;
+        canvas.height=800;
+        // 定义数组对象，每个对象里面存放绘制的路径和颜色
+        let arr=[
+            {p:[{x:0,y:0},{x:800,y:0},{x:400,y:400}],color:'#caff67'},
+            {p:[{x:0,y:0},{x:400,y:400},{x:0,y:800}],color:'#67becf'},
+            {p:[{x:800,y:0},{x:800,y:400},{x:600,y:600},{x:600,y:200}],color:'#ef3d61'},
+            {p:[{x:600,y:200},{x:600,y:600},{x:400,y:400}],color:'#f9f51a'},
+            {p:[{x:400,y:400},{x:600,y:600},{x:400,y:800},{x:200,y:600}],color:'#a594c0'},
+            {p:[{x:200,y:600},{x:400,y:800},{x:0,y:800}],color:'#fa8ecc'},
+            {p:[{x:800,y:400},{x:800,y:800},{x:400,y:800}],color:'#f6ca29'},
+        ]
+        // 创建绘制函数
+        function draw(arr,ctx){
+            for(let i of arr){
+                ctx.beginPath();
+                ctx.moveTo(i.p[0].x,i.p[0].y);
+                for(let j=1;j<i.p.length;j++){
+                    ctx.lineTo(i.p[j].x,i.p[j].y);
+                }
+                ctx.closePath();
+                ctx.fillStyle=i.color;
+                ctx.fill();
+            }
+        }
+        draw(arr,contex);
+
+    </script>
+</body>
+</html>

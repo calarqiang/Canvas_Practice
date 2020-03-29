@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>canvas实现小球</title>
+    <style>
+        body{
+            margin:0;
+            padding:0;
+        }
+      canvas{
+          background:linear-gradient(to top, #222,#111);
+      }
+    </style>
+</head>
+<body>
+    <canvas id='canvas'>你的浏览器不支持canvas这个标签</canvas>
+    <button id='adbtn'>点击我，添加球球</button>
+    <button id='stop'>点击我，暂停球球</button>
+    <button id='run'>点击我，开始运行</button>
+    <script>
+        let canvas=document.getElementById('canvas');
+        let adbtn=document.getElementById('adbtn');
+        let stop=document.getElementById('stop');
+        let run=document.getElementById('run');
+        let ctx=canvas.getContext('2d');
+        let balls=[];
+        let speed=[-5,5];
+        //初始化函数 
+       function init(){
+        canvas.width=document.body.clientWidth-50;
+        canvas.height=document.body.clientHeight+400;
+        canvas.style.display='block';
+        canvas.style.border='1px solid red';
+        canvas.style.margin='50px auto';
+       }
+     
+       //生成随机颜色函数
+       function RandomColor(start,end){
+           let colors=[];
+          colors.push(Math.floor(Math.random()*(end-start+1)));
+          colors.push(Math.floor(Math.random()*(end-start+1)));
+          colors.push(Math.floor(Math.random()*(end-start+1)));
+          return colors;
+       }
+      //生成合理随机半径小球
+      function createBalls(min,max,start,end){
+        let obj={};
+        obj.radius=Math.floor(Math.random()*(max-min)+min);
+        obj.x=Math.floor(Math.random()*(canvas.width-2*obj.radius)+obj.radius);
+        obj.y=Math.floor(Math.random()*(canvas.height-2*obj.radius)+obj.radius);
+        obj.speedX=Math.floor(Math.random()*(speed[1]-speed[0])+speed[0]);
+        obj.speedY=Math.floor(Math.random()*(speed[1]-speed[0])+speed[0]);
+        console.log(obj.speedX)
+        if(obj.speedX==0){
+            obj.speedX=1;
+        }
+        if(obj.speedY==0){
+            obj.speedY=1;
+        }
+        let colors=RandomColor(start,end);
+        let r=colors[0];
+        let g=colors[1];
+        let b=colors[2];
+        obj.bgColor="rgb("+r+','+g+','+b+")";
+        balls.push(obj);
+      }
+      //开始绘制小球
+      function drawBalls(balls,ctx){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        for(let i=0;i<balls.length;i++){
+            ctx.beginPath();
+            ctx.arc(balls[i].x,balls[i].y,balls[i].radius,0,Math.PI*2);
+            ctx.fillStyle=balls[i].bgColor;
+            ctx.fill();
+            ctx.closePath();
+            balls[i].x+=balls[i].speedX;
+            balls[i].y+=balls[i].speedY;
+        if(balls[i].x-balls[i].radius<0||balls[i].x+balls[i].radius>=canvas.width){
+            balls[i].speedX=-balls[i].speedX;
+        }
+         if (balls[i].y-balls[i].radius<0||balls[i].y>=canvas.height-balls[i].radius){
+            balls[i].speedY=-balls[i].speedY;
+        }
+    }
+       
+  }
+  let flag;
+      //总函数
+      function Finally(){
+          //初始化函数
+          init();
+          //绘制10个小球
+          for(let i=0;i<10;i++){
+              createBalls(10,25,0,255);
+          }
+          drawBalls(balls,ctx);
+         flag=setInterval(function(){
+            drawBalls(balls,ctx);
+        },10)
+      }
+      Finally();
+      
+    adbtn.addEventListener('click',function(){
+
+        for(let i=0;i<10;i++){
+              createBalls(10,25,0,255);
+          }
+        //   这里的作用是当定时器停止时，我们点击添加按钮时，会实时预览添加的小球
+          drawBalls(balls,ctx);
+         
+    })
+    stop.addEventListener('click',function(){
+        clearInterval(flag);
+    })
+
+    run.addEventListener('click',function(){
+        //每次进来前，都清除一下定时器
+        clearInterval(flag);
+        flag=setInterval(function(){
+            drawBalls(balls,ctx);
+        },10)
+    })
+// 点击画布添加小球，每次10个
+    canvas.addEventListener('click',function(){
+        for(let i=0;i<10;i++){
+              createBalls(10,25,0,255);
+          }
+         
+    })
+    </script>
+</body>
+</html>
